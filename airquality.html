@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Air Quality Monitoring App</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background-color: rgb(55, 141, 167);
+        }
+        h1 {
+            color: rgb(1, 32, 23);
+            text-align: center;
+        }
+        #results {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>My First Web Page</h1>
+    <p>0-50: good <br> 
+        51-100: moderate <br>
+        101-150: unhealthy for sensitive groups <br>
+        151-200: unhealthy <br>
+        201-300: very unhealthy <br>
+        301-500: hazardous
+    </p>
+    <div style="text-align: center;">
+        <input id="cityInput" placeholder="Enter a City">
+        <button id="searchBtn">Search</button>
+    </div>
+    <div id="results"></div>
+
+    <script>
+        const API_KEY = "5f1d99bfbd87524e74c157933a76bd679305503c";
+
+        async function fetchAQIData(city) {
+            const url = `https://api.waqi.info/feed/${city}/?token=${API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
+        }
+
+        async function onSearchClick() {
+            const city = document.getElementById("cityInput").value.trim();
+            const resultElement = document.getElementById("results");
+
+            if (city === "") {
+                resultElement.innerHTML = "Please enter a city";
+                return;
+            }
+
+            try {
+                const data = await fetchAQIData(city);
+                if (data.status === "ok") {
+                    resultElement.innerHTML = `<h3>${city}</h3><p>AQI: ${data.data.aqi}</p>`;
+                } else {
+                    resultElement.innerHTML = `No data available for "${city}".`;
+                }
+            } catch (error) {
+                resultElement.textContent = "Error fetching data. Please try again later.";
+                console.error("Error fetching AQI data", error);
+            }
+        }
+
+        document.getElementById("searchBtn").addEventListener("click", onSearchClick);
+    </script>
+</body>
+</html>
